@@ -1,0 +1,77 @@
+// include the library code:
+#include <Servo.h>
+#include <LiquidCrystal.h>
+
+// initialize the library with the numbers of the interface pins
+LiquidCrystal lcd(7, 8, 9, 10, 11, 12);    
+const int trigPin = 7;
+const int echoPin = 6;
+long duration;
+int  distance;
+
+int pos = 0;
+int positions_vector[7]= {30, 60, 90 ,120, 150, 180};    // set the servo angles 
+Servo servo_9;
+
+void setup()
+{
+   servo_9.attach(9);           // set arduino pin 
+   lcd.begin(16, 2);            // set up the LCD's number of columns and rows:
+   pinMode(trigPin, OUTPUT);    // set arduino pin to output mode
+   pinMode(echoPin, INPUT);     // set arduino pin to input mode
+   Serial.begin(9600);          // initialize serial port
+
+}
+
+void loop()
+{
+  for (pos = 0; pos < 6; pos += 1)  
+  {
+    servo_9.write(positions_vector[pos]);
+    delay(15); 
+    lcd.setCursor(0, 0);                    // set the cursor to column 0, line 0
+    lcd.print("servo angle");               
+    delay(1500);
+    lcd.clear();
+    delay(1000);
+  
+    lcd.setCursor(0, 1);                    // set the cursor to column 0, line 1
+    lcd.print(positions_vector[pos]);       // dislapy the servo angle in the lcd screen
+    delay(1500);
+    lcd.clear();
+    delay(1000);
+  
+    digitalWrite(trigPin, LOW);       // the trigPin is set at close 
+    delayMicroseconds(2);
+    digitalWrite(trigPin, HIGH);      // the trigPin is set to produce the ultrasonic wave
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);       // the echoPin is set at closed 
+    duration = pulseIn(echoPin, HIGH);// pulse genarated at echopin at receiving of the wave is used to calculate the time  
+
+    distance= duration*0.034/2;       // distance= time*(speed of sound)/2 
+     
+    Serial.print("Distance: ");
+    Serial.println(distance);         // dispaly distance in the lcd screen
+    lcd.setCursor(0, 0);                 // set the cursor to column 0, line 0
+    lcd.print("distance:");
+    delay(1500);
+    lcd.clear();
+    delay(1000);
+    lcd.setCursor(0, 1);                // set the cursor to column 0, line 1          
+    lcd.print(distance);
+    delay(1500);
+    lcd.clear();
+    delay(1000);
+    
+    //switching LED on in different posiitons of the motor 
+    if(distance>0 & distance<=50) {digitalWrite(4,HIGH);}
+    else { digitalWrite(4,LOW);}
+    if(distance>50 & distance<75) {digitalWrite(3,HIGH);}
+    else { digitalWrite(3,LOW);}
+    if(distance>=75) {digitalWrite(2,HIGH);}
+    else { digitalWrite(2,LOW);}
+   
+   
+  }
+
+}
